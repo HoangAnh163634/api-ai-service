@@ -1,26 +1,33 @@
 steps:
-  # Build Docker Image
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-t', 'gcr.io/project-prn231-gr3/api-ai-service', '.']
-
-  # Push Docker Image lên Google Container Registry (GCR)
-  - name: 'gcr.io/cloud-builders/docker'
-    args: ['push', 'gcr.io/project-prn231-gr3/api-ai-service']
-    
-  # Deploy lên Cloud Run
-  - name: 'gcr.io/cloud-builders/gcloud'
     args: [
-      'run', 'deploy', 'api-ai-service',
-      '--image=gcr.io/project-prn231-gr3/api-ai-service',
-      '--region=asia-east1',
-      '--platform=managed',
-      '--allow-unauthenticated',
-      '--port=5202'
+      'build',
+      '-t',
+      'gcr.io/project-prn231-gr3/api-ai-service:$COMMIT_SHA',
+      '.'
     ]
 
-images:
-  - 'gcr.io/project-prn231-gr3/api-ai-service'
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/project-prn231-gr3/api-ai-service:$COMMIT_SHA']
+
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args:
+      - 'run'
+      - 'deploy'
+      - 'api-ai-service'
+      - '--image'
+      - 'gcr.io/project-prn231-gr3/api-ai-service:$COMMIT_SHA'
+      - '--region'
+      - 'asia-east1'
+      - '--platform=managed'
+      - '--allow-unauthenticated'
+      - '--port=5202'
+
+logsBucket: 'gs://api-service-log'
 
 options:
-  logging: CLOUD_LOGGING_ONLY
-  logsBucket: "gs://ai-service-log"
+  logging: GCS_ONLY
+
+images:
+  - 'gcr.io/project-prn231-gr3/api-ai-service:$COMMIT_SHA'
