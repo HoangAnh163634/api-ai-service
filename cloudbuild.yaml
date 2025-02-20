@@ -1,15 +1,13 @@
 steps:
   - id: "create private key file"
-    name: "gcr.io/cloud-builders/git"
+    name: "gcr.io/cloud-builders/bash"
     entrypoint: "bash"
+    secretEnv: ["PRIVATE_KEY", "PUBLIC_KEY"]
     args:
       - "-c"
       - |
-        echo "$PRIVATE_KEY" > /workspace/private_key.pem && \
-        echo "$PUBLIC_KEY" > /workspace/public_key.pem
-    secretEnv:
-      - "PRIVATE_KEY"
-      - "PUBLIC_KEY"
+        echo "$$PRIVATE_KEY" > /workspace/private_key.pem
+        echo "$$PUBLIC_KEY" > /workspace/public_key.pem
 
   - id: "build image"
     name: "gcr.io/cloud-builders/docker"
@@ -38,14 +36,6 @@ steps:
         "--allow-unauthenticated",
         "--port=5202"
       ]
-
-logsBucket: "gs://api-service-log"
-
-options:
-  logging: GCS_ONLY
-
-images:
-  - "gcr.io/project-prn231-gr3/api-ai-service:$COMMIT_SHA"
 
 availableSecrets:
   secretManager:
