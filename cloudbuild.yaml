@@ -22,4 +22,4 @@ images:
   - 'gcr.io/project-prn231-gr3/api-ai-service'
 
 options:
-  logBucket: "gs://ai-service-log"
+  logBucket: CLOUD_LOGGING_ONLY
