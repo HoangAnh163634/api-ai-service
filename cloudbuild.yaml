@@ -15,7 +15,7 @@ steps:
       '--region=asia-east1',
       '--platform=managed',
       '--allow-unauthenticated',
-      '--port=5198'
+      '--port=5202'
     ]
 
 images:
