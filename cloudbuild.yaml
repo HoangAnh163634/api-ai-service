@@ -1,6 +1,6 @@
 steps:
   - id: "create private key file"
-    name: "gcr.io/cloud-builders/bash"
+    name: "gcr.io/cloud-builders/git"
     entrypoint: "bash"
     secretEnv: ["PRIVATE_KEY", "PUBLIC_KEY"]
     args:
@@ -36,6 +36,8 @@ steps:
         "--allow-unauthenticated",
         "--port=5202"
       ]
+
+logsBucket: "gs://api-service-log/"
 
 availableSecrets:
   secretManager:
