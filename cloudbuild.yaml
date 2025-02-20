@@ -3,7 +3,8 @@ steps:
     args: [
       'build',
       '-t',
-      'gcr.io/project-prn231-gr3/api-ai-service:$COMMIT_SHA',
+      'gcr.io/project-prn231-gr3/api-ai-service',
+      'api-ai-service/Dockerfile',
       '.'
     ]
 
