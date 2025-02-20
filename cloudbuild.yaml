@@ -3,10 +3,10 @@ steps:
     name: "gcr.io/cloud-builders/git"
     entrypoint: "bash"
     args:
-      - "-c"
-      - |
-        echo "$$PRIVATE_KEY" > /workspace/private_key.pem
-        echo "$$PUBLIC_KEY" > /workspace/public_key.pem
+  - "-c"
+  - |
+    echo "$$PRIVATE_KEY" > /workspace/private_key.pem && \
+    echo "$$PUBLIC_KEY" > /workspace/public_key.pem
     secretEnv: ["PRIVATE_KEY", "PUBLIC_KEY"]
 
   - id: "build image"
