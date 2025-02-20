@@ -1,29 +1,30 @@
 steps:
-  - name: 'gcr.io/cloud-builders/docker'
-    args: [
-      'build',
-      '-t',
-      'gcr.io/project-prn231-gr3/api-ai-service',
-      'api-ai-service/Dockerfile',
-      '.'
-    ]
+  - id: "build image"
+    name: "gcr.io/cloud-builders/docker"
+    entrypoint: 'bash'
+    args:
+      [
+        '-c',
+        'docker build --build-arg CONTAINER_PRIVATE_KEY=$$PRIVATE_KEY --build-arg CONTAINER_PUBLIC_KEY=$$PUBLIC_KEY -t gcr.io/project-prn231-gr3/api-ai-service:$COMMIT_SHA -f api-ai-service/Dockerfile .'
+      ]
+    secretEnv: ['PRIVATE_KEY', 'PUBLIC_KEY']
 
-  - name: 'gcr.io/cloud-builders/docker'
-    args: ['push', 'gcr.io/project-prn231-gr3/api-ai-service:$COMMIT_SHA']
+  - id: "push image"
+    name: "gcr.io/cloud-builders/docker"
+    args: ["push", "gcr.io/project-prn231-gr3/api-ai-service:$COMMIT_SHA"]
 
-  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+  - id: "deploy to cloud run"
+    name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     entrypoint: gcloud
     args:
-      - 'run'
-      - 'deploy'
-      - 'api-ai-service'
-      - '--image'
-      - 'gcr.io/project-prn231-gr3/api-ai-service:$COMMIT_SHA'
-      - '--region'
-      - 'asia-east1'
-      - '--platform=managed'
-      - '--allow-unauthenticated'
-      - '--port=5202'
+      [
+        'run', 'deploy', 'api-ai-service',
+        '--image', 'gcr.io/project-prn231-gr3/api-ai-service:$COMMIT_SHA',
+        '--region', 'asia-east1',
+        '--platform=managed',
+        '--allow-unauthenticated',
+        '--port=5202'
+      ]
 
 logsBucket: 'gs://api-service-log'
 
@@ -31,4 +32,11 @@ options:
   logging: GCS_ONLY
 
 images:
-  - 'gcr.io/project-prn231-gr3/api-ai-service:$COMMIT_SHA'
+  - "gcr.io/project-prn231-gr3/api-ai-service:$COMMIT_SHA"
+
+availableSecrets:
+  secretManager:
+    - versionName: "projects/${_PROJECT_ID_NUMBER}/secrets/${_CONTAINER_PRIVATE_KEY_SECRET_NAME}/versions/latest"
+      env: "PRIVATE_KEY"
+    - versionName: "projects/${_PROJECT_ID_NUMBER}/secrets/${_CONTAINER_PUBLIC_KEY_SECRET_NAME}/versions/latest"
+      env: "PUBLIC_KEY"
