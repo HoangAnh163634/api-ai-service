@@ -21,3 +21,6 @@ steps:
 images:
   - 'gcr.io/project-prn231-gr3/api-ai-service'
 
+options:
+  logging: CLOUD_LOGGING_ONLY
+  logsBucket: "gs://ai-service-log"
