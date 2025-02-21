@@ -1,6 +1,7 @@
 steps:
-  - id: "build image"
-    name: "gcr.io/cloud-builders/docker"
+  # Build Docker Image
+  - name: "gcr.io/cloud-builders/docker"
+    id: "build-image"
     args:
       [
         "build",
@@ -9,20 +10,30 @@ steps:
         "api-ai-service/api-ai-service/"
       ]
 
-  - id: "push image"
-    name: "gcr.io/cloud-builders/docker"
+  # Push Docker Image lên Google Container Registry (GCR)
+  - name: "gcr.io/cloud-builders/docker"
+    id: "push-image"
     args: ["push", "gcr.io/project-prn231-gr3/api-ai-service:$COMMIT_SHA"]
 
-  - id: "deploy to cloud run"
-    name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
+  # Deploy lên Cloud Run
+  - name: "gcr.io/cloud-builders/gcloud"
+    id: "deploy-cloud-run"
     args:
       [
         "run", "deploy", "api-ai-service",
         "--image", "gcr.io/project-prn231-gr3/api-ai-service:$COMMIT_SHA",
         "--region", "asia-east1",
-        "--platform=managed",
+        "--platform", "managed",
         "--allow-unauthenticated",
-        "--port=5202"
+        "--port", "5202"
       ]
 
+# Google Cloud Storage bucket để lưu log build
 logsBucket: "gs://api-service-log/"
+
+# Danh sách image tạo ra
+images:
+  - "gcr.io/project-prn231-gr3/api-ai-service:$COMMIT_SHA"
+
+# Set timeout cho build process (10 phút)
+timeout: 600s
