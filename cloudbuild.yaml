@@ -1,36 +1,35 @@
 steps:
   # Build Docker Image
-  - id: "build-image"
-    name: "gcr.io/cloud-builders/docker"
+  - name: "gcr.io/cloud-builders/docker"
     args:
       [
         "build",
         "-t", "gcr.io/project-prn231-gr3/api-ai-service:$COMMIT_SHA",
         "-f", "api-ai-service/Dockerfile",
-        "api-ai-service/"
+        "."
       ]
 
   # Push Docker Image lên Google Container Registry (GCR)
-  - id: "push-image"
-    name: "gcr.io/cloud-builders/docker"
+  - name: "gcr.io/cloud-builders/docker"
     args: ["push", "gcr.io/project-prn231-gr3/api-ai-service:$COMMIT_SHA"]
 
   # Deploy lên Cloud Run
-  - id: "deploy-to-cloud-run"
-    name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
+  - name: "gcr.io/cloud-builders/gcloud"
     args:
       [
         "run", "deploy", "api-ai-service",
         "--image", "gcr.io/project-prn231-gr3/api-ai-service:$COMMIT_SHA",
         "--region", "asia-east1",
-        "--platform=managed",
+        "--platform", "managed",
         "--allow-unauthenticated",
-        "--port=5202"
+        "--port", "5202"
       ]
 
-# Define Google Cloud Storage bucket for build logs
+# Define a Google Cloud Storage bucket for build logs
 logsBucket: "gs://api-service-log/"
 
-# Specify images for caching
 images:
-  - "gcr.io/project-prn231-gr3/api-ai-service:$COMMIT_SHA"
+  - "gcr.io/project-prn231-gr3/api-ai-service"
+
+# Set build timeout to 15 minutes
+timeout: 600s

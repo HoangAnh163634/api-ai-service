@@ -4,10 +4,10 @@ EXPOSE 80
 
 FROM mcr.microsoft.com/dotnet/sdk:8.0-preview AS build
 WORKDIR /src
-COPY ["api-ai-service.csproj", "./"]
+COPY ["api-ai-service/api-ai-service.csproj", "./"]
 RUN dotnet restore "api-ai-service.csproj"
 
-COPY . .
+COPY api-ai-service/ .  
 RUN dotnet build "api-ai-service.csproj" -c Release -o /app/build
 
 FROM build AS publish
