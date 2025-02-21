@@ -4,8 +4,7 @@ EXPOSE 80
 
 FROM mcr.microsoft.com/dotnet/sdk:8.0-preview AS build
 WORKDIR /src
-
-COPY ["api-ai-service/api-ai-service.csproj", "./"]
+COPY ["api-ai-service/api-ai-service/api-ai-service.csproj", "./"]
 RUN dotnet restore "api-ai-service.csproj"
 
 COPY . .

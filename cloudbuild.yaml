@@ -6,7 +6,7 @@ steps:
         "build",
         "-t", "gcr.io/project-prn231-gr3/api-ai-service:$COMMIT_SHA",
         "-f", "api-ai-service/api-ai-service/Dockerfile",
-        "."
+        "api-ai-service/api-ai-service/"
       ]
 
   - id: "push image"
